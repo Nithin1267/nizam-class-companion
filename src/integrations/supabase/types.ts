@@ -14,7 +14,181 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      attendance_records: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          status: string
+          subject_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          status: string
+          subject_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          status?: string
+          subject_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_records_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      attendance_summary: {
+        Row: {
+          attended_classes: number
+          id: string
+          last_alert_sent_at: string | null
+          percentage: number
+          subject_id: string
+          total_classes: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          attended_classes?: number
+          id?: string
+          last_alert_sent_at?: string | null
+          percentage?: number
+          subject_id: string
+          total_classes?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          attended_classes?: number
+          id?: string
+          last_alert_sent_at?: string | null
+          percentage?: number
+          subject_id?: string
+          total_classes?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_summary_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          read: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          read?: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          read?: boolean
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          department: string
+          email: string
+          id: string
+          name: string
+          notification_enabled: boolean
+          roll_number: string
+          semester: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          department: string
+          email: string
+          id?: string
+          name: string
+          notification_enabled?: boolean
+          roll_number: string
+          semester?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          department?: string
+          email?: string
+          id?: string
+          name?: string
+          notification_enabled?: boolean
+          roll_number?: string
+          semester?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      subjects: {
+        Row: {
+          code: string
+          created_at: string
+          department: string
+          id: string
+          name: string
+          semester: number
+          type: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          department: string
+          id?: string
+          name: string
+          semester: number
+          type: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          department?: string
+          id?: string
+          name?: string
+          semester?: number
+          type?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
