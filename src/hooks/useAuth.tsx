@@ -89,39 +89,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signUp = async (
     email: string, 
     password: string, 
-    role: AppRole, 
+    signUpRole: AppRole, 
     name: string,
     additionalData?: Record<string, any>
   ) => {
     const redirectUrl = `${window.location.origin}/`;
     
+    // Pass metadata to indicate role for the trigger
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: redirectUrl,
+        data: {
+          signup_as_teacher: signUpRole === 'teacher' ? 'true' : 'false',
+        },
       },
     });
 
     if (error) return { error };
 
     if (data.user) {
-      // Create user role
-      const { error: roleError } = await supabase
-        .from('user_roles')
-        .insert({ user_id: data.user.id, role });
-
-      if (roleError) {
-        console.error('Error creating role:', roleError);
-        return { error: roleError };
-      }
-
       // Create profile
       const profileData = {
         user_id: data.user.id,
         email,
         name,
-        roll_number: additionalData?.rollNumber || `${role.toUpperCase()}-${Date.now()}`,
+        roll_number: additionalData?.rollNumber || `${signUpRole.toUpperCase()}-${Date.now()}`,
         department: additionalData?.department || 'Computer Science',
         semester: additionalData?.semester || 1,
       };

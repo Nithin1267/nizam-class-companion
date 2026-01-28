@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { StudentAuth } from "./pages/StudentAuth";
 import { TeacherAuth } from "./pages/TeacherAuth";
 import { TeacherDashboard } from "./pages/TeacherDashboard";
+import { AdminDashboard } from "./pages/AdminDashboard";
 import { Dashboard } from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
@@ -51,7 +52,10 @@ function LandingRedirect() {
   }
   
   if (user) {
-    if (role === 'teacher' || role === 'admin') {
+    if (role === 'admin') {
+      return <Navigate to="/admin" replace />;
+    }
+    if (role === 'teacher') {
       return <Navigate to="/teacher/dashboard" replace />;
     }
     return <Navigate to="/dashboard" replace />;
@@ -67,6 +71,7 @@ function AppRoutes() {
       <Route path="/student" element={<StudentAuth />} />
       <Route path="/teacher" element={<TeacherAuth />} />
       <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
+      <Route path="/admin" element={<AdminDashboard />} />
       <Route 
         path="/dashboard" 
         element={
