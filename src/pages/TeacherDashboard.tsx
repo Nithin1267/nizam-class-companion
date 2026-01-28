@@ -5,8 +5,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { GraduationCap, LogOut, Users, BookOpen, Bell, ClipboardCheck, Plus, AlertTriangle } from 'lucide-react';
+import { GraduationCap, LogOut, Users, BookOpen, Bell, ClipboardCheck, Plus, AlertTriangle, FileSpreadsheet } from 'lucide-react';
 import { MarkAttendance } from '@/components/teacher/MarkAttendance';
+import { BulkAttendanceImport } from '@/components/teacher/BulkAttendanceImport';
 import { StudentList } from '@/components/teacher/StudentList';
 import { SubjectManagement } from '@/components/teacher/SubjectManagement';
 import { SendAlerts } from '@/components/teacher/SendAlerts';
@@ -230,10 +231,14 @@ export function TeacherDashboard() {
 
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="mb-6">
+          <TabsList className="mb-6 flex-wrap">
             <TabsTrigger value="attendance" className="gap-2">
               <ClipboardCheck className="w-4 h-4" />
               Mark Attendance
+            </TabsTrigger>
+            <TabsTrigger value="bulk-import" className="gap-2">
+              <FileSpreadsheet className="w-4 h-4" />
+              Bulk Import
             </TabsTrigger>
             <TabsTrigger value="students" className="gap-2">
               <Users className="w-4 h-4" />
@@ -251,6 +256,10 @@ export function TeacherDashboard() {
 
           <TabsContent value="attendance">
             <MarkAttendance subjects={subjects} onAttendanceMarked={fetchStats} />
+          </TabsContent>
+
+          <TabsContent value="bulk-import">
+            <BulkAttendanceImport subjects={subjects} onAttendanceImported={fetchStats} />
           </TabsContent>
 
           <TabsContent value="students">
