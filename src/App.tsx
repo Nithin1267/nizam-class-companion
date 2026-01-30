@@ -28,6 +28,10 @@ function ProtectedStudentRoute({ children }: { children: React.ReactNode }) {
     return <Navigate to="/student" replace />;
   }
   
+  if (role === 'admin') {
+    return <Navigate to="/admin" replace />;
+  }
+  
   if (role === 'teacher') {
     return <Navigate to="/teacher/dashboard" replace />;
   }
