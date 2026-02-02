@@ -9,6 +9,8 @@ import { TeacherAuth } from "./pages/TeacherAuth";
 import { TeacherDashboard } from "./pages/TeacherDashboard";
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { Dashboard } from "./pages/Dashboard";
+import { ForgotPassword } from "./pages/ForgotPassword";
+import { ResetPassword } from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -74,6 +76,8 @@ function AppRoutes() {
       <Route path="/" element={<LandingRedirect />} />
       <Route path="/student" element={<StudentAuth />} />
       <Route path="/teacher" element={<TeacherAuth />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
       <Route path="/admin" element={<AdminDashboard />} />
       <Route 
