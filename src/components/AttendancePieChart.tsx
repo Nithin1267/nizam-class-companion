@@ -1,9 +1,13 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-import { mockSubjects } from '@/lib/mockData';
+import { Subject } from '@/lib/mockData';
 
-export function AttendancePieChart() {
-  const theorySubjects = mockSubjects.filter(s => s.type === 'theory');
-  const labSubjects = mockSubjects.filter(s => s.type === 'lab');
+interface AttendancePieChartProps {
+  subjects?: Subject[];
+}
+
+export function AttendancePieChart({ subjects = [] }: AttendancePieChartProps) {
+  const theorySubjects = subjects.filter(s => s.type === 'theory');
+  const labSubjects = subjects.filter(s => s.type === 'lab');
 
   const theoryAttended = theorySubjects.reduce((acc, s) => acc + s.attendedClasses, 0);
   const theoryTotal = theorySubjects.reduce((acc, s) => acc + s.totalClasses, 0);
@@ -17,6 +21,20 @@ export function AttendancePieChart() {
     { name: 'Lab Present', value: labAttended, color: 'hsl(174, 62%, 47%)' },
     { name: 'Lab Absent', value: labTotal - labAttended, color: 'hsl(174, 62%, 75%)' },
   ];
+
+  if (subjects.length === 0) {
+    return (
+      <div className="elevated-card rounded-xl p-6 animate-fade-in">
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold font-display">Attendance Distribution</h3>
+          <p className="text-sm text-muted-foreground mt-1">No attendance data available</p>
+        </div>
+        <div className="h-[280px] flex items-center justify-center text-muted-foreground">
+          Distribution chart will appear here
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="elevated-card rounded-xl p-6 animate-fade-in">
