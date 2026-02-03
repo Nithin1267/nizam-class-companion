@@ -1,19 +1,66 @@
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Legend } from 'recharts';
-import { getMonthlyData } from '@/lib/mockData';
+import { Subject } from '@/lib/mockData';
 
-export function AttendanceChart() {
-  const data = getMonthlyData();
+interface AttendanceChartProps {
+  subjects?: Subject[];
+}
+
+export function AttendanceChart({ subjects = [] }: AttendanceChartProps) {
+  // Generate monthly data based on real attendance if available
+  // For now, we'll show subject-based data since we don't have monthly historical data
+  const theorySubjects = subjects.filter(s => s.type === 'theory');
+  const labSubjects = subjects.filter(s => s.type === 'lab');
+
+  // Create data points for each subject
+  const data = subjects.length > 0 
+    ? subjects.map(s => ({
+        name: s.code,
+        classes: s.type === 'theory' ? s.percentage : null,
+        labs: s.type === 'lab' ? s.percentage : null,
+      }))
+    : [];
+
+  // Group by subject for better visualization
+  const chartData = theorySubjects.map((theory, index) => {
+    const lab = labSubjects[index];
+    return {
+      name: theory.code.replace(/L?$/, ''),
+      classes: theory.percentage,
+      labs: lab?.percentage || 0,
+    };
+  });
+
+  // If no matching pairs, show all subjects
+  const finalData = chartData.length > 0 ? chartData : subjects.map(s => ({
+    name: s.code,
+    classes: s.type === 'theory' ? s.percentage : 0,
+    labs: s.type === 'lab' ? s.percentage : 0,
+  }));
+
+  if (subjects.length === 0) {
+    return (
+      <div className="elevated-card rounded-xl p-6 animate-fade-in">
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold font-display">Attendance Trend</h3>
+          <p className="text-sm text-muted-foreground mt-1">No attendance data available yet</p>
+        </div>
+        <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+          Attendance data will appear here once recorded
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="elevated-card rounded-xl p-6 animate-fade-in">
       <div className="mb-6">
-        <h3 className="text-lg font-semibold font-display">Attendance Trend</h3>
-        <p className="text-sm text-muted-foreground mt-1">Monthly attendance percentage for classes and labs</p>
+        <h3 className="text-lg font-semibold font-display">Attendance by Subject</h3>
+        <p className="text-sm text-muted-foreground mt-1">Attendance percentage for classes and labs</p>
       </div>
 
       <div className="h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+          <AreaChart data={finalData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="colorClasses" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="hsl(221, 83%, 30%)" stopOpacity={0.3} />
@@ -26,7 +73,7 @@ export function AttendanceChart() {
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
             <XAxis 
-              dataKey="month" 
+              dataKey="name" 
               stroke="hsl(var(--muted-foreground))" 
               fontSize={12}
               tickLine={false}
@@ -37,7 +84,7 @@ export function AttendanceChart() {
               fontSize={12}
               tickLine={false}
               axisLine={false}
-              domain={[50, 100]}
+              domain={[0, 100]}
               tickFormatter={(value) => `${value}%`}
             />
             <Tooltip
@@ -73,6 +120,7 @@ export function AttendanceChart() {
               strokeWidth={2}
               fillOpacity={1}
               fill="url(#colorClasses)"
+              connectNulls
             />
             <Area
               type="monotone"
@@ -82,6 +130,7 @@ export function AttendanceChart() {
               strokeWidth={2}
               fillOpacity={1}
               fill="url(#colorLabs)"
+              connectNulls
             />
           </AreaChart>
         </ResponsiveContainer>

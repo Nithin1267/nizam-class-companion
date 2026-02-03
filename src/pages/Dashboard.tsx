@@ -240,10 +240,10 @@ export function Dashboard({ onLogout }: DashboardProps) {
         {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           <div className="lg:col-span-2">
-            <AttendanceChart />
+            <AttendanceChart subjects={subjects} />
           </div>
           <div>
-            <AttendancePieChart />
+            <AttendancePieChart subjects={subjects} />
           </div>
         </div>
 
