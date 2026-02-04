@@ -38,6 +38,18 @@ export function ProfileSetupCard({ userId, email, onCreated }: ProfileSetupCardP
     setSubmitting(true);
     setError(null);
     try {
+      // Check if roll number already exists
+      const { data: existing } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("roll_number", rollNumber.trim())
+        .maybeSingle();
+
+      if (existing) {
+        setError("This roll number is already registered. Please use a different roll number or contact support if this is your account.");
+        return;
+      }
+
       const { error: insertError } = await supabase.from("profiles").insert({
         user_id: userId,
         email: email ?? "",
@@ -48,7 +60,14 @@ export function ProfileSetupCard({ userId, email, onCreated }: ProfileSetupCardP
       });
 
       if (insertError) {
-        setError(insertError.message);
+        // Provide user-friendly error for common issues
+        if (insertError.message.includes("profiles_roll_number_key")) {
+          setError("This roll number is already registered. Please use a different roll number.");
+        } else if (insertError.message.includes("profiles_email_key")) {
+          setError("This email is already registered with another account.");
+        } else {
+          setError(insertError.message);
+        }
         return;
       }
 
