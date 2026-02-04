@@ -6,6 +6,7 @@ import { AttendanceChart } from '@/components/AttendanceChart';
 import { AttendancePieChart } from '@/components/AttendancePieChart';
 import { RecentAttendance } from '@/components/RecentAttendance';
 import { StatsCard } from '@/components/StatsCard';
+import { ProfileSetupCard } from '@/components/ProfileSetupCard';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { BookOpen, FlaskConical, Target, Calendar, AlertTriangle, TrendingUp, Loader2 } from 'lucide-react';
@@ -21,6 +22,7 @@ export function Dashboard({ onLogout }: DashboardProps) {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [attendanceHistory, setAttendanceHistory] = useState<AttendanceRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const [profileMissing, setProfileMissing] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -32,6 +34,7 @@ export function Dashboard({ onLogout }: DashboardProps) {
     if (!user) return;
 
     try {
+      setProfileMissing(false);
       // Fetch student profile - RLS ensures only own data is returned
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
@@ -40,6 +43,15 @@ export function Dashboard({ onLogout }: DashboardProps) {
         .single();
 
       if (profileError) {
+        // If the user has no profile row yet, show the setup UI instead of a dead-end error.
+        // PostgREST uses PGRST116 when `.single()` returns 0 rows.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const code = (profileError as any)?.code as string | undefined;
+        if (code === 'PGRST116') {
+          setStudent(null);
+          setProfileMissing(true);
+          return;
+        }
         console.error('Error fetching profile:', profileError);
       } else if (profile) {
         setStudent({
@@ -118,6 +130,21 @@ export function Dashboard({ onLogout }: DashboardProps) {
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
           <p className="text-muted-foreground">Loading your dashboard...</p>
         </div>
+      </div>
+    );
+  }
+
+  if (profileMissing && user) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+        <ProfileSetupCard
+          userId={user.id}
+          email={user.email}
+          onCreated={() => {
+            setLoading(true);
+            fetchStudentData();
+          }}
+        />
       </div>
     );
   }
