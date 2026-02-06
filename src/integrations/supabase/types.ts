@@ -256,6 +256,44 @@ export type Database = {
           },
         ]
       }
+      timetable: {
+        Row: {
+          created_at: string
+          day_of_week: number
+          end_time: string
+          id: string
+          room_number: string | null
+          start_time: string
+          subject_id: string
+        }
+        Insert: {
+          created_at?: string
+          day_of_week: number
+          end_time: string
+          id?: string
+          room_number?: string | null
+          start_time: string
+          subject_id: string
+        }
+        Update: {
+          created_at?: string
+          day_of_week?: number
+          end_time?: string
+          id?: string
+          room_number?: string | null
+          start_time?: string
+          subject_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "timetable_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
