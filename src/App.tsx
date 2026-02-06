@@ -9,6 +9,7 @@ import { TeacherAuth } from "./pages/TeacherAuth";
 import { TeacherDashboard } from "./pages/TeacherDashboard";
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { Dashboard } from "./pages/Dashboard";
+import ProfilePage from "./pages/ProfilePage";
 import { ForgotPassword } from "./pages/ForgotPassword";
 import { ResetPassword } from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
@@ -85,6 +86,14 @@ function AppRoutes() {
         element={
           <ProtectedStudentRoute>
             <StudentDashboardWrapper />
+          </ProtectedStudentRoute>
+        } 
+      />
+      <Route 
+        path="/profile" 
+        element={
+          <ProtectedStudentRoute>
+            <ProfilePage />
           </ProtectedStudentRoute>
         } 
       />

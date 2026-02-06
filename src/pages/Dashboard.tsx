@@ -7,6 +7,8 @@ import { AttendancePieChart } from '@/components/AttendancePieChart';
 import { RecentAttendance } from '@/components/RecentAttendance';
 import { StatsCard } from '@/components/StatsCard';
 import { ProfileSetupCard } from '@/components/ProfileSetupCard';
+import { TimetableView } from '@/components/TimetableView';
+import { AttendancePrediction } from '@/components/AttendancePrediction';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { BookOpen, FlaskConical, Target, Calendar, AlertTriangle, TrendingUp, Loader2 } from 'lucide-react';
@@ -179,7 +181,7 @@ export function Dashboard({ onLogout }: DashboardProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header student={student} onLogout={onLogout} />
+      <Header student={student} userId={user?.id || ''} onLogout={onLogout} />
       
       <main className="container px-4 py-6">
         {/* Welcome Section - Shows logged-in student's name */}
@@ -275,13 +277,19 @@ export function Dashboard({ onLogout }: DashboardProps) {
         </div>
 
         {/* Subject Table and Recent Activity */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           <div className="lg:col-span-2">
             <SubjectTable subjects={subjects} />
           </div>
           <div>
             <RecentAttendance records={attendanceHistory} />
           </div>
+        </div>
+
+        {/* Timetable and Predictions */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <TimetableView semester={student.semester} department={student.department} />
+          <AttendancePrediction subjects={subjects} />
         </div>
       </main>
 
