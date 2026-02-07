@@ -263,7 +263,7 @@ export function TeacherDashboard() {
           </TabsContent>
 
           <TabsContent value="students">
-            <StudentList subjects={subjects} />
+            <StudentList subjects={subjects} defaultDepartment={profile?.department} />
           </TabsContent>
 
           <TabsContent value="subjects">

@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Search, AlertTriangle, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { AddStudentDialog } from './AddStudentDialog';
 
 interface Subject {
   id: string;
@@ -31,9 +32,10 @@ interface StudentWithAttendance {
 
 interface StudentListProps {
   subjects: Subject[];
+  defaultDepartment?: string;
 }
 
-export function StudentList({ subjects }: StudentListProps) {
+export function StudentList({ subjects, defaultDepartment = '' }: StudentListProps) {
   const [selectedSubject, setSelectedSubject] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [students, setStudents] = useState<StudentWithAttendance[]>([]);
@@ -117,6 +119,15 @@ export function StudentList({ subjects }: StudentListProps) {
 
   return (
     <div className="space-y-6">
+      {/* Header with Add Button */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold">Student Management</h2>
+        <AddStudentDialog 
+          defaultDepartment={defaultDepartment} 
+          onStudentAdded={fetchStudents} 
+        />
+      </div>
+
       {/* Filters */}
       <Card>
         <CardContent className="pt-6">
