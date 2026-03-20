@@ -320,6 +320,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      finalize_user_profile: {
+        Args: {
+          p_department?: string
+          p_email: string
+          p_name: string
+          p_roll_number: string
+          p_semester?: number
+          p_user_id: string
+        }
+        Returns: Json
+      }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
@@ -329,6 +340,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_roll_number_available: {
+        Args: { p_roll_number: string }
         Returns: boolean
       }
     }
