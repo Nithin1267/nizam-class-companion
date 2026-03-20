@@ -87,17 +87,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signUp = async (
-    email: string, 
-    password: string, 
-    signUpRole: AppRole, 
+    email: string,
+    password: string,
+    signUpRole: AppRole,
     name: string,
     additionalData?: Record<string, any>
   ) => {
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedName = name.trim();
+    const requestedRollNumber = String(
+      additionalData?.rollNumber || `${signUpRole.toUpperCase()}-${Date.now()}`
+    ).trim();
+    const requestedDepartment = String(
+      additionalData?.department || 'Computer Science'
+    ).trim();
+    const parsedSemester = Number(additionalData?.semester ?? 1);
+    const requestedSemester = Number.isInteger(parsedSemester) && parsedSemester > 0 ? parsedSemester : 1;
+
+    if (signUpRole === 'student') {
+      const { data: rollAvailable, error: rollCheckError } = await (supabase as any).rpc(
+        'is_roll_number_available',
+        { p_roll_number: requestedRollNumber }
+      );
+
+      if (rollCheckError) {
+        console.error('Error checking roll number availability:', rollCheckError);
+        return { error: new Error('Unable to validate roll number right now. Please try again.') };
+      }
+
+      if (!rollAvailable) {
+        return {
+          error: new Error(
+            'This roll number is already registered. Please sign in with your existing account or contact your teacher/admin.'
+          ),
+        };
+      }
+    }
+
     const redirectUrl = `${window.location.origin}/`;
-    
-    // Pass metadata to indicate role for the trigger
+
     const { data, error } = await supabase.auth.signUp({
-      email,
+      email: normalizedEmail,
       password,
       options: {
         emailRedirectTo: redirectUrl,
@@ -107,27 +137,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
     });
 
-    if (error) return { error };
-
-    if (data.user) {
-      // Create profile
-      const profileData = {
-        user_id: data.user.id,
-        email,
-        name,
-        roll_number: additionalData?.rollNumber || `${signUpRole.toUpperCase()}-${Date.now()}`,
-        department: additionalData?.department || 'Computer Science',
-        semester: additionalData?.semester || 1,
-      };
-
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert(profileData);
-
-      if (profileError) {
-        console.error('Error creating profile:', profileError);
-        return { error: profileError };
+    if (error) {
+      if (error.message?.toLowerCase().includes('user already registered')) {
+        return {
+          error: new Error('This email is already registered. Please sign in or reset your password.'),
+        };
       }
+      return { error };
+    }
+
+    if (!data.user) {
+      return { error: new Error('Account creation failed. Please try again.') };
+    }
+
+    const { data: profileResult, error: profileError } = await (supabase as any).rpc(
+      'finalize_user_profile',
+      {
+        p_user_id: data.user.id,
+        p_email: normalizedEmail,
+        p_name: normalizedName,
+        p_roll_number: requestedRollNumber,
+        p_department: requestedDepartment,
+        p_semester: requestedSemester,
+      }
+    );
+
+    if (profileError) {
+      console.error('Error creating profile:', profileError);
+      await supabase.auth.signOut();
+      return { error: new Error('Unable to create your profile right now. Please try again.') };
+    }
+
+    if (!profileResult?.ok) {
+      await supabase.auth.signOut();
+      return {
+        error: new Error(
+          profileResult?.message || 'Unable to complete signup. Please verify your details and try again.'
+        ),
+      };
     }
 
     return { error: null };
