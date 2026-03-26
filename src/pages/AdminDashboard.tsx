@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { GraduationCap, LogOut, Users, BookOpen, BarChart3, UserCog, Shield } from 'lucide-react';
+import { RoleSwitcher } from '@/components/RoleSwitcher';
 import { UserManagement } from '@/components/admin/UserManagement';
 import { SystemAnalytics } from '@/components/admin/SystemAnalytics';
 import { SubjectOverview } from '@/components/admin/SubjectOverview';

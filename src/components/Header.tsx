@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { GraduationCap, LogOut, User, Settings } from 'lucide-react';
 import { Student } from '@/lib/mockData';
 import { NotificationBell } from '@/components/NotificationBell';
+import { RoleSwitcher } from '@/components/RoleSwitcher';
 import { Link } from 'react-router-dom';
 
 interface HeaderProps {
