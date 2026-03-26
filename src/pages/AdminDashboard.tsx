@@ -126,6 +126,7 @@ export function AdminDashboard() {
           </div>
 
           <div className="flex items-center gap-4">
+            <RoleSwitcher />
             <div className="hidden md:flex items-center gap-2 text-right">
               <div>
                 <p className="text-sm font-medium">Administrator</p>

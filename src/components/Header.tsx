@@ -26,6 +26,7 @@ export function Header({ student, userId, onLogout }: HeaderProps) {
         </div>
 
         <div className="flex items-center gap-2">
+          <RoleSwitcher />
           <NotificationBell userId={userId} />
           
           <Button variant="ghost" size="icon" asChild>
