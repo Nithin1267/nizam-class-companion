@@ -8,10 +8,12 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   role: AppRole | null;
+  availableRoles: AppRole[];
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string, role: AppRole, name: string, additionalData?: Record<string, any>) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
+  switchRole: (newRole: AppRole) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
