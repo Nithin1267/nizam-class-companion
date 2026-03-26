@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { GraduationCap, LogOut, User, Settings } from 'lucide-react';
+import { GraduationCap, LogOut, User, Settings, FileBarChart } from 'lucide-react';
 import { Student } from '@/lib/mockData';
 import { NotificationBell } from '@/components/NotificationBell';
 import { RoleSwitcher } from '@/components/RoleSwitcher';
@@ -28,6 +28,12 @@ export function Header({ student, userId, onLogout }: HeaderProps) {
         <div className="flex items-center gap-2">
           <RoleSwitcher />
           <NotificationBell userId={userId} />
+          
+          <Button variant="ghost" size="icon" asChild title="Attendance Report">
+            <Link to="/report">
+              <FileBarChart className="w-5 h-5" />
+            </Link>
+          </Button>
           
           <Button variant="ghost" size="icon" asChild>
             <Link to="/profile">
