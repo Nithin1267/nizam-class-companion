@@ -192,15 +192,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: null };
   };
 
+  const switchRole = (newRole: AppRole) => {
+    if (availableRoles.includes(newRole)) {
+      setRole(newRole);
+    }
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
     setRole(null);
+    setAvailableRoles([]);
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, role, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, session, role, availableRoles, loading, signIn, signUp, signOut, switchRole }}>
       {children}
     </AuthContext.Provider>
   );
