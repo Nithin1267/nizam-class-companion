@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { GraduationCap, LogOut, Users, BookOpen, BarChart3, UserCog, Shield } from 'lucide-react';
+import { RoleSwitcher } from '@/components/RoleSwitcher';
 import { UserManagement } from '@/components/admin/UserManagement';
 import { SystemAnalytics } from '@/components/admin/SystemAnalytics';
 import { SubjectOverview } from '@/components/admin/SubjectOverview';
@@ -125,6 +126,7 @@ export function AdminDashboard() {
           </div>
 
           <div className="flex items-center gap-4">
+            <RoleSwitcher />
             <div className="hidden md:flex items-center gap-2 text-right">
               <div>
                 <p className="text-sm font-medium">Administrator</p>

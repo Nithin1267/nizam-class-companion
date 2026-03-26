@@ -8,10 +8,12 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   role: AppRole | null;
+  availableRoles: AppRole[];
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string, role: AppRole, name: string, additionalData?: Record<string, any>) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
+  switchRole: (newRole: AppRole) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -20,6 +22,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [role, setRole] = useState<AppRole | null>(null);
+  const [availableRoles, setAvailableRoles] = useState<AppRole[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -61,18 +64,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')
-        .eq('user_id', userId)
-        .maybeSingle();
+        .eq('user_id', userId);
 
       if (error) {
         console.error('Error fetching role:', error);
         setRole(null);
+        setAvailableRoles([]);
+      } else if (data && data.length > 0) {
+        const roles = data.map((r) => r.role as AppRole);
+        setAvailableRoles(roles);
+        // Prefer admin > teacher > student as default
+        const priority: AppRole[] = ['admin', 'teacher', 'student'];
+        const bestRole = priority.find((p) => roles.includes(p)) ?? roles[0];
+        setRole(bestRole);
       } else {
-        setRole(data?.role as AppRole ?? null);
+        setRole(null);
+        setAvailableRoles([]);
       }
     } catch (err) {
       console.error('Error fetching role:', err);
       setRole(null);
+      setAvailableRoles([]);
     } finally {
       setLoading(false);
     }
@@ -180,15 +192,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: null };
   };
 
+  const switchRole = (newRole: AppRole) => {
+    if (availableRoles.includes(newRole)) {
+      setRole(newRole);
+    }
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
     setRole(null);
+    setAvailableRoles([]);
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, role, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, session, role, availableRoles, loading, signIn, signUp, signOut, switchRole }}>
       {children}
     </AuthContext.Provider>
   );
