@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { GraduationCap, LogOut, Users, BookOpen, Bell, ClipboardCheck, Plus, AlertTriangle, FileSpreadsheet } from 'lucide-react';
+import { RoleSwitcher } from '@/components/RoleSwitcher';
 import { MarkAttendance } from '@/components/teacher/MarkAttendance';
 import { BulkAttendanceImport } from '@/components/teacher/BulkAttendanceImport';
 import { StudentList } from '@/components/teacher/StudentList';
