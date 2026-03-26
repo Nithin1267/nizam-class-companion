@@ -64,18 +64,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')
-        .eq('user_id', userId)
-        .maybeSingle();
+        .eq('user_id', userId);
 
       if (error) {
         console.error('Error fetching role:', error);
         setRole(null);
+        setAvailableRoles([]);
+      } else if (data && data.length > 0) {
+        const roles = data.map((r) => r.role as AppRole);
+        setAvailableRoles(roles);
+        // Prefer admin > teacher > student as default
+        const priority: AppRole[] = ['admin', 'teacher', 'student'];
+        const bestRole = priority.find((p) => roles.includes(p)) ?? roles[0];
+        setRole(bestRole);
       } else {
-        setRole(data?.role as AppRole ?? null);
+        setRole(null);
+        setAvailableRoles([]);
       }
     } catch (err) {
       console.error('Error fetching role:', err);
       setRole(null);
+      setAvailableRoles([]);
     } finally {
       setLoading(false);
     }
