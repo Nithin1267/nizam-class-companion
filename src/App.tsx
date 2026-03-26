@@ -10,6 +10,7 @@ import { TeacherDashboard } from "./pages/TeacherDashboard";
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { Dashboard } from "./pages/Dashboard";
 import ProfilePage from "./pages/ProfilePage";
+import AttendanceReport from "./pages/AttendanceReport";
 import { ForgotPassword } from "./pages/ForgotPassword";
 import { ResetPassword } from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
@@ -95,6 +96,14 @@ function AppRoutes() {
         element={
           <ProtectedStudentRoute>
             <ProfilePage />
+          </ProtectedStudentRoute>
+        } 
+      />
+      <Route 
+        path="/report" 
+        element={
+          <ProtectedStudentRoute>
+            <AttendanceReport />
           </ProtectedStudentRoute>
         } 
       />
