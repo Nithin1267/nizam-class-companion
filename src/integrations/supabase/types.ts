@@ -194,6 +194,45 @@ export type Database = {
         }
         Relationships: []
       }
+      student_invitations: {
+        Row: {
+          consumed_at: string | null
+          created_at: string
+          department: string
+          email: string
+          expires_at: string
+          id: string
+          invited_by: string
+          name: string
+          roll_number: string
+          semester: number
+        }
+        Insert: {
+          consumed_at?: string | null
+          created_at?: string
+          department: string
+          email: string
+          expires_at?: string
+          id?: string
+          invited_by: string
+          name: string
+          roll_number: string
+          semester?: number
+        }
+        Update: {
+          consumed_at?: string | null
+          created_at?: string
+          department?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          invited_by?: string
+          name?: string
+          roll_number?: string
+          semester?: number
+        }
+        Relationships: []
+      }
       subjects: {
         Row: {
           code: string
@@ -344,6 +383,10 @@ export type Database = {
       }
       is_roll_number_available: {
         Args: { p_roll_number: string }
+        Returns: boolean
+      }
+      teacher_teaches_student: {
+        Args: { _student_id: string; _teacher_id: string }
         Returns: boolean
       }
     }
