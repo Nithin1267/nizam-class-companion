@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
@@ -36,26 +37,59 @@ interface StudentListProps {
 }
 
 export function StudentList({ subjects, defaultDepartment = '' }: StudentListProps) {
+  const { user, role } = useAuth();
   const [selectedSubject, setSelectedSubject] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [students, setStudents] = useState<StudentWithAttendance[]>([]);
   const [loading, setLoading] = useState(false);
+  const [scopeKeys, setScopeKeys] = useState<string[] | null>(null);
 
   useEffect(() => {
     fetchStudents();
-  }, [selectedSubject]);
+  }, [selectedSubject, scopeKeys]);
+
+  useEffect(() => {
+    const loadScope = async () => {
+      if (!user || role === 'admin') {
+        setScopeKeys(null);
+        return;
+      }
+      const { data } = await supabase
+        .from('teacher_assignments')
+        .select('department, semester')
+        .eq('teacher_id', user.id);
+      setScopeKeys((data ?? []).map((a) => `${a.department}__${a.semester}`));
+    };
+    void loadScope();
+  }, [user, role]);
 
   const fetchStudents = async () => {
     setLoading(true);
 
     try {
-      // Fetch all students
-      const { data: profiles, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('roll_number');
+      // Fetch students. For teachers, restrict to their assigned (department, semester) groups.
+      let query = supabase.from('profiles').select('*').order('roll_number');
+      if (role !== 'admin' && scopeKeys !== null) {
+        if (scopeKeys.length === 0) {
+          setStudents([]);
+          setLoading(false);
+          return;
+        }
+        const departments = Array.from(new Set(scopeKeys.map((k) => k.split('__')[0])));
+        const semesters = Array.from(new Set(scopeKeys.map((k) => Number(k.split('__')[1]))));
+        query = query.in('department', departments).in('semester', semesters);
+      }
+      const { data: profilesRaw, error } = await query;
 
       if (error) throw error;
+
+      // Further filter to exact (dept, sem) pairs for teachers
+      const profiles =
+        role !== 'admin' && scopeKeys !== null
+          ? (profilesRaw ?? []).filter((p: any) =>
+              scopeKeys.includes(`${p.department}__${p.semester}`),
+            )
+          : profilesRaw;
 
       if (profiles) {
         // For each student, get their attendance summary
