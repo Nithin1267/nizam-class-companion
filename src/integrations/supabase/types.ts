@@ -90,6 +90,101 @@ export type Database = {
           },
         ]
       }
+      course_types: {
+        Row: {
+          course_id: string
+          created_at: string
+          id: string
+          type_name: string
+          updated_at: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          id?: string
+          type_name: string
+          updated_at?: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          id?: string
+          type_name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_types_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      courses: {
+        Row: {
+          course_name: string
+          created_at: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          course_name: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          course_name?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      groups: {
+        Row: {
+          course_id: string
+          created_at: string
+          group_name: string
+          id: string
+          type_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          group_name: string
+          id?: string
+          type_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          group_name?: string
+          id?: string
+          type_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "groups_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "groups_type_id_fkey"
+            columns: ["type_id"]
+            isOneToOne: false
+            referencedRelation: "course_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       manual_alerts: {
         Row: {
           created_at: string
@@ -160,39 +255,96 @@ export type Database = {
           created_at: string
           department: string
           email: string
+          group_name: string | null
           id: string
+          medium: string | null
           name: string
           notification_enabled: boolean
           roll_number: string
+          second_language: string | null
           semester: number
+          specialization: string | null
           updated_at: string
           user_id: string
+          year_or_semester: string | null
         }
         Insert: {
           created_at?: string
           department: string
           email: string
+          group_name?: string | null
           id?: string
+          medium?: string | null
           name: string
           notification_enabled?: boolean
           roll_number: string
+          second_language?: string | null
           semester?: number
+          specialization?: string | null
           updated_at?: string
           user_id: string
+          year_or_semester?: string | null
         }
         Update: {
           created_at?: string
           department?: string
           email?: string
+          group_name?: string | null
           id?: string
+          medium?: string | null
           name?: string
           notification_enabled?: boolean
           roll_number?: string
+          second_language?: string | null
           semester?: number
+          specialization?: string | null
           updated_at?: string
           user_id?: string
+          year_or_semester?: string | null
         }
         Relationships: []
+      }
+      specializations: {
+        Row: {
+          course_id: string
+          created_at: string
+          id: string
+          specialization_name: string
+          type_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          id?: string
+          specialization_name: string
+          type_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          id?: string
+          specialization_name?: string
+          type_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "specializations_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "specializations_type_id_fkey"
+            columns: ["type_id"]
+            isOneToOne: false
+            referencedRelation: "course_types"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       student_invitations: {
         Row: {
@@ -232,6 +384,119 @@ export type Database = {
           semester?: number
         }
         Relationships: []
+      }
+      student_subject_mapping: {
+        Row: {
+          created_at: string
+          id: string
+          student_id: string
+          subject_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          student_id: string
+          subject_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          student_id?: string
+          subject_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_subject_mapping_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      study_materials: {
+        Row: {
+          course_id: string | null
+          created_at: string
+          file_link: string
+          group_id: string | null
+          id: string
+          material_type: string
+          medium: string | null
+          specialization_id: string | null
+          subject_id: string | null
+          title: string
+          type_id: string | null
+          updated_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          course_id?: string | null
+          created_at?: string
+          file_link: string
+          group_id?: string | null
+          id?: string
+          material_type: string
+          medium?: string | null
+          specialization_id?: string | null
+          subject_id?: string | null
+          title: string
+          type_id?: string | null
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          course_id?: string | null
+          created_at?: string
+          file_link?: string
+          group_id?: string | null
+          id?: string
+          material_type?: string
+          medium?: string | null
+          specialization_id?: string | null
+          subject_id?: string | null
+          title?: string
+          type_id?: string | null
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "study_materials_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "study_materials_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "study_materials_specialization_id_fkey"
+            columns: ["specialization_id"]
+            isOneToOne: false
+            referencedRelation: "specializations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "study_materials_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "study_materials_type_id_fkey"
+            columns: ["type_id"]
+            isOneToOne: false
+            referencedRelation: "course_types"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subjects: {
         Row: {
