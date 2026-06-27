@@ -281,6 +281,7 @@ export function TeacherDashboard() {
           </TabsContent>
         </Tabs>
       </main>
+      <Footer />
     </div>
   );
 }

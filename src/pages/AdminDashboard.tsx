@@ -251,6 +251,7 @@ export function AdminDashboard() {
           </TabsContent>
         </Tabs>
       </main>
+      <Footer />
     </div>
   );
 }
