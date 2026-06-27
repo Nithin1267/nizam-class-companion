@@ -1,0 +1,1 @@
+TRUNCATE TABLE public.attendance_records, public.attendance_summary, public.manual_alerts, public.notifications, public.timetable RESTART IDENTITY;

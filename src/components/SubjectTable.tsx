@@ -43,6 +43,11 @@ export function SubjectTable({ subjects }: SubjectTableProps) {
       </div>
       
       <div className="overflow-x-auto">
+        {subjects.length === 0 ? (
+          <div className="p-8 text-center text-sm text-muted-foreground">
+            No attendance data available
+          </div>
+        ) : (
         <table className="w-full">
           <thead>
             <tr className="bg-muted/50">
@@ -104,6 +109,7 @@ export function SubjectTable({ subjects }: SubjectTableProps) {
             ))}
           </tbody>
         </table>
+        )}
       </div>
     </div>
   );

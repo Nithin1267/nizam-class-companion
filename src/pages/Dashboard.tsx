@@ -304,8 +304,6 @@ export function Dashboard({ onLogout }: DashboardProps) {
             value={attendedClasses}
             subtitle={totalClasses > 0 ? `${Math.round((attendedClasses / totalClasses) * 100)}% of total` : '0% of total'}
             icon={TrendingUp}
-            trend="up"
-            trendValue="2.5%"
           />
           <StatsCard
             title="Missed"
