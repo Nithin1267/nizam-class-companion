@@ -13,6 +13,7 @@ import { SystemAnalytics } from '@/components/admin/SystemAnalytics';
 import { SubjectOverview } from '@/components/admin/SubjectOverview';
 import { MasterDataManagement } from '@/components/admin/MasterDataManagement';
 import { StudyMaterialsManagement } from '@/components/admin/StudyMaterialsManagement';
+import { TeacherAssignments } from '@/components/admin/TeacherAssignments';
 import { useToast } from '@/hooks/use-toast';
 
 interface Stats {
@@ -289,6 +290,10 @@ export function AdminDashboard() {
               <FileText className="w-4 h-4" />
               Study Materials
             </TabsTrigger>
+            <TabsTrigger value="assignments" className="gap-2">
+              <UserCog className="w-4 h-4" />
+              Teacher Assignments
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="analytics">
@@ -309,6 +314,10 @@ export function AdminDashboard() {
 
           <TabsContent value="materials">
             <StudyMaterialsManagement />
+          </TabsContent>
+
+          <TabsContent value="assignments">
+            <TeacherAssignments />
           </TabsContent>
         </Tabs>
       </main>
