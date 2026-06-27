@@ -159,6 +159,22 @@ export function Dashboard({ onLogout }: DashboardProps) {
     }
   };
 
+  const filterCounts = useMemo(
+    () => ({
+      all: subjects.length,
+      theory: subjects.filter((s) => s.type === 'theory').length,
+      lab: subjects.filter((s) => s.type === 'lab').length,
+      safe: subjects.filter((s) => s.percentage >= 75).length,
+      warning: subjects.filter((s) => s.percentage >= 70 && s.percentage < 75).length,
+      critical: subjects.filter((s) => s.percentage < 70).length,
+    }),
+    [subjects],
+  );
+  const filteredSubjects = useMemo(
+    () => applySubjectFilter(subjects, subjectFilter),
+    [subjects, subjectFilter],
+  );
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -212,22 +228,6 @@ export function Dashboard({ onLogout }: DashboardProps) {
   const labAttendance = labTotal > 0 ? Math.round((labAttended / labTotal) * 100) : 0;
   
   const atRiskSubjects = subjects.filter(s => s.percentage < 75).length;
-
-  const filterCounts = useMemo(
-    () => ({
-      all: subjects.length,
-      theory: subjects.filter((s) => s.type === 'theory').length,
-      lab: subjects.filter((s) => s.type === 'lab').length,
-      safe: subjects.filter((s) => s.percentage >= 75).length,
-      warning: subjects.filter((s) => s.percentage >= 70 && s.percentage < 75).length,
-      critical: subjects.filter((s) => s.percentage < 70).length,
-    }),
-    [subjects],
-  );
-  const filteredSubjects = useMemo(
-    () => applySubjectFilter(subjects, subjectFilter),
-    [subjects, subjectFilter],
-  );
 
   return (
     <div className="min-h-screen bg-background">
