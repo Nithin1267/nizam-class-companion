@@ -1,0 +1,5 @@
+ALTER TABLE public.profiles
+  ADD COLUMN IF NOT EXISTS mobile_number TEXT,
+  ADD COLUMN IF NOT EXISTS section TEXT,
+  ADD COLUMN IF NOT EXISTS date_of_joining DATE,
+  ADD COLUMN IF NOT EXISTS avatar_url TEXT;

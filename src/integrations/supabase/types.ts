@@ -252,16 +252,20 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
           created_at: string
+          date_of_joining: string | null
           department: string
           email: string
           group_name: string | null
           id: string
           medium: string | null
+          mobile_number: string | null
           name: string
           notification_enabled: boolean
           roll_number: string
           second_language: string | null
+          section: string | null
           semester: number
           specialization: string | null
           updated_at: string
@@ -269,16 +273,20 @@ export type Database = {
           year_or_semester: string | null
         }
         Insert: {
+          avatar_url?: string | null
           created_at?: string
+          date_of_joining?: string | null
           department: string
           email: string
           group_name?: string | null
           id?: string
           medium?: string | null
+          mobile_number?: string | null
           name: string
           notification_enabled?: boolean
           roll_number: string
           second_language?: string | null
+          section?: string | null
           semester?: number
           specialization?: string | null
           updated_at?: string
@@ -286,16 +294,20 @@ export type Database = {
           year_or_semester?: string | null
         }
         Update: {
+          avatar_url?: string | null
           created_at?: string
+          date_of_joining?: string | null
           department?: string
           email?: string
           group_name?: string | null
           id?: string
           medium?: string | null
+          mobile_number?: string | null
           name?: string
           notification_enabled?: boolean
           roll_number?: string
           second_language?: string | null
+          section?: string | null
           semester?: number
           specialization?: string | null
           updated_at?: string
