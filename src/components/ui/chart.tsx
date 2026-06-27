@@ -65,26 +65,37 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     return null;
   }
 
-  return (
-    <style
-      dangerouslySetInnerHTML={{
-        __html: Object.entries(THEMES)
-          .map(
-            ([theme, prefix]) => `
-${prefix} [data-chart=${id}] {
-${colorConfig
-  .map(([key, itemConfig]) => {
-    const color = itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color;
-    return color ? `  --color-${key}: ${color};` : null;
-  })
-  .join("\n")}
-}
-`,
-          )
-          .join("\n"),
-      }}
-    />
-  );
+  // SECURITY: chart `config` values can come from caller code; reject anything
+  // that could escape a CSS custom-property value (no `}`, `<`, `;`, `/*`, urls, etc).
+  // Allow only safe CSS color tokens: hex, rgb(a), hsl(a), var(...), and a small
+  // set of named colors. This prevents XSS via injected `</style><script>`.
+  const SAFE_COLOR = /^(#[0-9a-fA-F]{3,8}|rgb\(\s*[\d.\s,%/]+\s*\)|rgba\(\s*[\d.\s,%/]+\s*\)|hsl\(\s*[\d.\s,%/deg]+\s*\)|hsla\(\s*[\d.\s,%/deg]+\s*\)|var\(--[a-zA-Z0-9_-]+(?:\s*,\s*[a-zA-Z0-9#%.,()\s_-]+)?\)|[a-zA-Z]+)$/;
+  const SAFE_ID = /^[a-zA-Z0-9_-]+$/;
+
+  if (!SAFE_ID.test(id)) {
+    return null;
+  }
+
+  const css = Object.entries(THEMES)
+    .map(([theme, prefix]) => {
+      const lines = colorConfig
+        .map(([key, itemConfig]) => {
+          if (!SAFE_ID.test(key)) return null;
+          const raw =
+            itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
+            itemConfig.color;
+          if (!raw || typeof raw !== "string") return null;
+          const color = raw.trim();
+          if (!SAFE_COLOR.test(color)) return null;
+          return `  --color-${key}: ${color};`;
+        })
+        .filter(Boolean)
+        .join("\n");
+      return `${prefix} [data-chart=${id}] {\n${lines}\n}`;
+    })
+    .join("\n");
+
+  return <style>{css}</style>;
 };
 
 const ChartTooltip = RechartsPrimitive.Tooltip;
