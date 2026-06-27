@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
+import { Footer } from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { GraduationCap, LogOut, Users, BookOpen, BarChart3, UserCog, Shield } from 'lucide-react';
@@ -251,6 +252,7 @@ export function AdminDashboard() {
           </TabsContent>
         </Tabs>
       </main>
+      <Footer />
     </div>
   );
 }

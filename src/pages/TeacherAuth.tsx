@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { GraduationCap, Mail, Lock, ArrowRight, User, ClipboardCheck, Users, BookOpen } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { Footer } from '@/components/Footer';
 
 const departments = [
   'Computer Science',
@@ -75,7 +76,8 @@ export function TeacherAuth() {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex flex-col">
+      <div className="flex flex-1">
       {/* Left Side - Hero */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, hsl(174 62% 35%) 0%, hsl(174 62% 25%) 50%, hsl(221 83% 30%) 100%)' }}>
         <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.05%22%3E%3Cpath%20d%3D%22M36%2034v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6%2034v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6%204V0H4v4H0v2h4v4h2V6h4V4H6z%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E')] opacity-30" />
@@ -139,8 +141,16 @@ export function TeacherAuth() {
 
       {/* Right Side - Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-background">
+        {/* Top-left logo (always visible on small screens) */}
+        <div className="absolute top-4 left-4 flex items-center gap-2 lg:hidden">
+          <div className="p-2 rounded-lg" style={{ background: 'linear-gradient(135deg, hsl(174 62% 47%) 0%, hsl(221 83% 30%) 100%)' }}>
+            <GraduationCap className="w-5 h-5 text-white" />
+          </div>
+          <span className="text-sm font-bold font-display">Nizam College</span>
+        </div>
+
         <div className="w-full max-w-md">
-          <div className="lg:hidden flex items-center gap-3 mb-8 justify-center">
+          <div className="lg:hidden flex items-center gap-3 mb-8 justify-center mt-8">
             <div className="p-2.5 rounded-lg" style={{ background: 'linear-gradient(135deg, hsl(174 62% 47%) 0%, hsl(221 83% 30%) 100%)' }}>
               <GraduationCap className="w-7 h-7 text-white" />
             </div>
@@ -209,6 +219,9 @@ export function TeacherAuth() {
                   required
                 />
               </div>
+              <p className="text-xs text-muted-foreground">
+                Use your college-registered email
+              </p>
             </div>
 
             <div className="space-y-2">
@@ -273,6 +286,8 @@ export function TeacherAuth() {
           </div>
         </div>
       </div>
+      </div>
+      <Footer />
     </div>
   );
 }

@@ -221,6 +221,8 @@ export function Dashboard({ onLogout }: DashboardProps) {
             percentage={overallAttendance}
             subtitle="Combined classes & labs"
             icon={<Target className="w-5 h-5 text-primary" />}
+            totalClasses={totalClasses}
+            attendedClasses={attendedClasses}
           />
           <AttendanceCard
             title="Theory Classes"
@@ -295,9 +297,12 @@ export function Dashboard({ onLogout }: DashboardProps) {
 
       {/* Footer */}
       <footer className="border-t border-border mt-8 py-6">
-        <div className="container px-4 text-center">
+        <div className="container px-4 text-center space-y-1">
           <p className="text-sm text-muted-foreground">
-            © 2024 Nizam College Attendance System. Maintain 75% attendance to be eligible for exams.
+            Maintain 75% attendance to be eligible for exams.
+          </p>
+          <p className="text-xs text-muted-foreground">
+            © {new Date().getFullYear()} Nizam College | Osmania University
           </p>
         </div>
       </footer>
