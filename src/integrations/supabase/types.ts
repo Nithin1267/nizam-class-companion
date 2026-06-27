@@ -543,6 +543,30 @@ export type Database = {
         }
         Relationships: []
       }
+      teacher_assignments: {
+        Row: {
+          created_at: string
+          department: string
+          id: string
+          semester: number
+          teacher_id: string
+        }
+        Insert: {
+          created_at?: string
+          department: string
+          id?: string
+          semester: number
+          teacher_id: string
+        }
+        Update: {
+          created_at?: string
+          department?: string
+          id?: string
+          semester?: number
+          teacher_id?: string
+        }
+        Relationships: []
+      }
       teacher_subjects: {
         Row: {
           created_at: string
@@ -660,6 +684,10 @@ export type Database = {
       }
       is_roll_number_available: {
         Args: { p_roll_number: string }
+        Returns: boolean
+      }
+      teacher_assigned_to_student: {
+        Args: { _student_id: string; _teacher_id: string }
         Returns: boolean
       }
       teacher_teaches_student: {
