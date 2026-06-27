@@ -93,35 +93,39 @@ export function AddStudentDialog({
     setSubmitting(true);
 
     try {
-      // Check if roll number already exists
-      const { data: existingRoll } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("roll_number", rollNumber.trim())
-        .maybeSingle();
+      // Get current user (the inviter)
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-      if (existingRoll) {
-        toast.error("This roll number is already registered");
+      if (!user) {
+        toast.error("You must be signed in to invite students");
         return;
       }
 
-      // Check if email already exists
-      const { data: existingEmail } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("email", email.trim())
-        .maybeSingle();
+      // Check for existing profile OR pending invitation collisions
+      const [{ data: existingRoll }, { data: existingEmail }, { data: existingInviteRoll }, { data: existingInviteEmail }] =
+        await Promise.all([
+          supabase.from("profiles").select("id").eq("roll_number", rollNumber.trim()).maybeSingle(),
+          supabase.from("profiles").select("id").eq("email", email.trim()).maybeSingle(),
+          supabase.from("student_invitations").select("id").eq("roll_number", rollNumber.trim()).maybeSingle(),
+          supabase.from("student_invitations").select("id").eq("email", email.trim()).maybeSingle(),
+        ]);
 
-      if (existingEmail) {
-        toast.error("This email is already registered");
+      if (existingRoll || existingInviteRoll) {
+        toast.error("This roll number is already registered or invited");
+        return;
+      }
+      if (existingEmail || existingInviteEmail) {
+        toast.error("This email is already registered or invited");
         return;
       }
 
-      // Create the student profile
-      // Note: This creates a profile entry without an auth user
-      // The student will need to sign up with this email to link their account
-      const { error } = await supabase.from("profiles").insert({
-        user_id: crypto.randomUUID(), // Placeholder until student signs up
+      // Create an invitation. The actual profile (with a real auth user_id)
+      // is created automatically when the student signs up with this email
+      // via the `finalize_user_profile` RPC which consumes the invitation.
+      const { error } = await supabase.from("student_invitations").insert({
+        invited_by: user.id,
         name: name.trim(),
         roll_number: rollNumber.trim(),
         email: email.trim(),
@@ -130,17 +134,17 @@ export function AddStudentDialog({
       });
 
       if (error) {
-        if (error.message.includes("profiles_roll_number_key")) {
-          toast.error("This roll number is already registered");
-        } else if (error.message.includes("profiles_email_key")) {
-          toast.error("This email is already registered");
+        if (error.message.includes("student_invitations_roll_unique")) {
+          toast.error("This roll number is already invited");
+        } else if (error.message.includes("student_invitations_email_unique")) {
+          toast.error("This email is already invited");
         } else {
           toast.error(error.message);
         }
         return;
       }
 
-      toast.success(`Student "${name}" added successfully!`);
+      toast.success(`Invitation created for "${name}". They can now sign up with ${email}.`);
       resetForm();
       setOpen(false);
       onStudentAdded?.();

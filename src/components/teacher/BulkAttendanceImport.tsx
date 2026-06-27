@@ -12,7 +12,6 @@ import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import Papa from 'papaparse';
-import * as XLSX from 'xlsx';
 
 interface Subject {
   id: string;
@@ -64,15 +63,8 @@ export function BulkAttendanceImport({ subjects, onAttendanceImported }: BulkAtt
         const text = await file.text();
         const result = Papa.parse<string[]>(text, { skipEmptyLines: true });
         data = result.data;
-      } else if (extension === 'xlsx' || extension === 'xls') {
-        // Parse Excel
-        const buffer = await file.arrayBuffer();
-        const workbook = XLSX.read(buffer, { type: 'array' });
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
-        data = XLSX.utils.sheet_to_json<string[]>(worksheet, { header: 1 });
       } else {
-        throw new Error('Unsupported file format. Please use CSV or Excel files.');
+        throw new Error('Unsupported file format. Please upload a .csv file (export from Excel as CSV).');
       }
 
       // Process data (skip header row)
@@ -259,7 +251,7 @@ export function BulkAttendanceImport({ subjects, onAttendanceImported }: BulkAtt
           Bulk Attendance Import
         </CardTitle>
         <CardDescription>
-          Upload a CSV or Excel file to import attendance for multiple students at once
+          Upload a CSV file to import attendance for multiple students at once
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -322,7 +314,7 @@ export function BulkAttendanceImport({ subjects, onAttendanceImported }: BulkAtt
             <input
               ref={fileInputRef}
               type="file"
-              accept=".csv,.xlsx,.xls"
+              accept=".csv,text/csv"
               className="hidden"
               onChange={handleFileSelect}
               disabled={!selectedSubject}
@@ -338,7 +330,7 @@ export function BulkAttendanceImport({ subjects, onAttendanceImported }: BulkAtt
                     : 'Select a subject first'}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  CSV or Excel files (.csv, .xlsx, .xls)
+                  CSV files only (.csv) — export from Excel as CSV
                 </p>
               </>
             )}

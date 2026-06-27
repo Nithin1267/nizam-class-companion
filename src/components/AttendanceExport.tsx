@@ -17,7 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { format, subMonths } from "date-fns";
 import { CalendarIcon, Download, FileSpreadsheet, FileText } from "lucide-react";
 import { toast } from "sonner";
-import * as XLSX from "xlsx";
+import { toCSV, downloadCSV } from "@/lib/csv";
 import { cn } from "@/lib/utils";
 
 interface AttendanceExportProps {
@@ -53,7 +53,7 @@ export function AttendanceExport({ userId, studentName }: AttendanceExportProps)
     return data;
   };
 
-  const exportToExcel = async () => {
+  const exportToCSV = async () => {
     setExporting(true);
     try {
       const [records, summary] = await Promise.all([
@@ -61,10 +61,6 @@ export function AttendanceExport({ userId, studentName }: AttendanceExportProps)
         fetchSummaryData(),
       ]);
 
-      // Create workbook
-      const wb = XLSX.utils.book_new();
-
-      // Summary sheet
       const summaryData = (summary || []).map((s: any) => ({
         Subject: s.subjects?.name || "Unknown",
         Code: s.subjects?.code || "N/A",
@@ -73,10 +69,6 @@ export function AttendanceExport({ userId, studentName }: AttendanceExportProps)
         Attended: s.attended_classes,
         "Percentage (%)": s.percentage,
       }));
-      const summarySheet = XLSX.utils.json_to_sheet(summaryData);
-      XLSX.utils.book_append_sheet(wb, summarySheet, "Summary");
-
-      // Records sheet
       const recordsData = (records || []).map((r: any) => ({
         Date: r.date,
         Subject: r.subjects?.name || "Unknown",
@@ -84,16 +76,14 @@ export function AttendanceExport({ userId, studentName }: AttendanceExportProps)
         Type: r.subjects?.type || "theory",
         Status: r.status,
       }));
-      const recordsSheet = XLSX.utils.json_to_sheet(recordsData);
-      XLSX.utils.book_append_sheet(wb, recordsSheet, "Daily Records");
 
-      // Generate and download
-      const fileName = `Attendance_${studentName.replace(/\s+/g, "_")}_${format(
+      const baseName = `Attendance_${studentName.replace(/\s+/g, "_")}_${format(
         new Date(),
-        "yyyy-MM-dd"
-      )}.xlsx`;
-      XLSX.writeFile(wb, fileName);
-      toast.success("Excel report downloaded!");
+        "yyyy-MM-dd",
+      )}`;
+      downloadCSV(`${baseName}_summary.csv`, toCSV(summaryData));
+      downloadCSV(`${baseName}_records.csv`, toCSV(recordsData));
+      toast.success("CSV reports downloaded (open in Excel)!");
     } catch (err) {
       console.error("Export error:", err);
       toast.error("Failed to export data");
@@ -213,7 +203,7 @@ export function AttendanceExport({ userId, studentName }: AttendanceExportProps)
           Export Attendance
         </CardTitle>
         <CardDescription>
-          Download your attendance records as Excel or PDF
+          Download your attendance records as CSV or PDF
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -273,12 +263,12 @@ export function AttendanceExport({ userId, studentName }: AttendanceExportProps)
 
         <div className="flex gap-2">
           <Button
-            onClick={exportToExcel}
+            onClick={exportToCSV}
             disabled={exporting}
             className="flex-1"
           >
             <FileSpreadsheet className="w-4 h-4 mr-2" />
-            Export Excel
+            Export CSV
           </Button>
           <Button
             onClick={exportToPDF}

@@ -14,8 +14,8 @@ import { ArrowLeft, CalendarIcon, Download, FileSpreadsheet, FileText, Filter, L
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, Legend } from 'recharts';
 import { format, subMonths, parseISO, startOfMonth, endOfMonth, eachDayOfInterval, isWithinInterval } from 'date-fns';
 import { cn } from '@/lib/utils';
-import * as XLSX from 'xlsx';
 import { toast } from 'sonner';
+import { toCSV, downloadCSV } from '@/lib/csv';
 
 interface AttendanceRow {
   id: string;
@@ -137,11 +137,9 @@ export default function AttendanceReport() {
   const presentFiltered = filteredRecords.filter((r) => r.status === 'present').length;
   const filteredPercentage = totalFiltered > 0 ? Math.round((presentFiltered / totalFiltered) * 100) : 0;
 
-  const exportToExcel = async () => {
+  const exportToCSV = async () => {
     setExporting(true);
     try {
-      const wb = XLSX.utils.book_new();
-
       const summaryData = summary.map((s) => ({
         Subject: s.subjects?.name || 'Unknown',
         Code: s.subjects?.code || 'N/A',
@@ -150,18 +148,17 @@ export default function AttendanceReport() {
         Attended: s.attended_classes,
         'Percentage (%)': s.percentage,
       }));
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summaryData), 'Summary');
-
       const recordsData = filteredRecords.map((r) => ({
         Date: r.date,
         Subject: r.subjects?.name || 'Unknown',
         Code: r.subjects?.code || 'N/A',
         Status: r.status,
       }));
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(recordsData), 'Records');
 
-      XLSX.writeFile(wb, `Attendance_Report_${format(new Date(), 'yyyy-MM-dd')}.xlsx`);
-      toast.success('Excel report downloaded!');
+      const base = `Attendance_Report_${format(new Date(), 'yyyy-MM-dd')}`;
+      downloadCSV(`${base}_summary.csv`, toCSV(summaryData));
+      downloadCSV(`${base}_records.csv`, toCSV(recordsData));
+      toast.success('CSV reports downloaded (open in Excel)!');
     } catch {
       toast.error('Failed to export');
     } finally {
@@ -191,9 +188,9 @@ export default function AttendanceReport() {
               <p className="text-sm text-muted-foreground">{profileName} • Detailed attendance analysis</p>
             </div>
           </div>
-          <Button onClick={exportToExcel} disabled={exporting} size="sm" className="gap-2">
+          <Button onClick={exportToCSV} disabled={exporting} size="sm" className="gap-2">
             <FileSpreadsheet className="w-4 h-4" />
-            Export Excel
+            Export CSV
           </Button>
         </div>
 
