@@ -59,7 +59,7 @@ export function AttendancePrediction({
       <CardContent className="space-y-4">
         {subjects.length === 0 ? (
           <p className="text-muted-foreground text-center py-4">
-            No subjects to analyze
+            No predictions available
           </p>
         ) : (
           <>

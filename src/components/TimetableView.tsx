@@ -104,7 +104,7 @@ export function TimetableView({ semester, department }: TimetableViewProps) {
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground text-center py-6">
-            No schedule available yet. Your teachers will set up the timetable.
+            No timetable assigned yet
           </p>
         </CardContent>
       </Card>

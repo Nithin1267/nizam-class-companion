@@ -70,9 +70,14 @@ export function AttendanceCard({
       </div>
       
       <div className="flex items-end gap-2 mb-3">
-        <span className={cn('text-4xl font-bold font-display', getStatusColor(percentage))}>
-          {percentage}%
-        </span>
+        {totalClasses === 0 ? (
+          <span className="text-4xl font-bold font-display text-muted-foreground">—</span>
+        ) : (
+          <span className={cn('text-4xl font-bold font-display', getStatusColor(percentage))}>
+            {percentage}%
+          </span>
+        )}
+        {totalClasses !== 0 && (
         <span
           className={cn(
             'inline-flex items-center gap-1 text-xs font-semibold rounded-full px-2 py-0.5 mb-1.5',
@@ -88,6 +93,7 @@ export function AttendanceCard({
           )}
           {isSafe ? 'Eligible' : 'At Risk'}
         </span>
+        )}
       </div>
 
       <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
@@ -102,6 +108,10 @@ export function AttendanceCard({
         <span className="text-warning font-medium">75% Required</span>
         <span>100%</span>
       </div>
+
+      {totalClasses === 0 && (
+        <p className="mt-3 text-xs text-muted-foreground">No attendance data available</p>
+      )}
 
       {classesNeeded !== null && classesNeeded > 0 && (
         <p className="mt-3 text-xs text-destructive flex items-start gap-1.5">

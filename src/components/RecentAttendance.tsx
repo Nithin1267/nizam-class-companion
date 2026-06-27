@@ -27,7 +27,11 @@ export function RecentAttendance({ records }: RecentAttendanceProps) {
       </div>
       
       <div className="divide-y divide-border max-h-[400px] overflow-y-auto">
-        {records.map((record, index) => (
+        {records.length === 0 ? (
+          <div className="p-8 text-center text-sm text-muted-foreground">
+            No recent activity found
+          </div>
+        ) : records.map((record, index) => (
           <div 
             key={`${record.date}-${record.subject}-${index}`}
             className="p-4 flex items-center justify-between hover:bg-muted/30 transition-colors"
