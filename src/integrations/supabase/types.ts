@@ -548,6 +548,7 @@ export type Database = {
           created_at: string
           department: string
           id: string
+          section: string | null
           semester: number
           teacher_id: string
         }
@@ -555,6 +556,7 @@ export type Database = {
           created_at?: string
           department: string
           id?: string
+          section?: string | null
           semester: number
           teacher_id: string
         }
@@ -562,6 +564,7 @@ export type Database = {
           created_at?: string
           department?: string
           id?: string
+          section?: string | null
           semester?: number
           teacher_id?: string
         }

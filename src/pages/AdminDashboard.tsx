@@ -14,6 +14,7 @@ import { SubjectOverview } from '@/components/admin/SubjectOverview';
 import { MasterDataManagement } from '@/components/admin/MasterDataManagement';
 import { StudyMaterialsManagement } from '@/components/admin/StudyMaterialsManagement';
 import { TeacherAssignments } from '@/components/admin/TeacherAssignments';
+import { CreateTeacher } from '@/components/admin/CreateTeacher';
 import { useToast } from '@/hooks/use-toast';
 
 interface Stats {
@@ -294,6 +295,10 @@ export function AdminDashboard() {
               <UserCog className="w-4 h-4" />
               Teacher Assignments
             </TabsTrigger>
+            <TabsTrigger value="create-teacher" className="gap-2">
+              <UserCog className="w-4 h-4" />
+              Create Teacher
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="analytics">
@@ -318,6 +323,10 @@ export function AdminDashboard() {
 
           <TabsContent value="assignments">
             <TeacherAssignments />
+          </TabsContent>
+
+          <TabsContent value="create-teacher">
+            <CreateTeacher />
           </TabsContent>
         </Tabs>
       </main>
