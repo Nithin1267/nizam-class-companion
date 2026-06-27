@@ -15,6 +15,7 @@ import { ForgotPassword } from "./pages/ForgotPassword";
 import { ResetPassword } from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import Presentation from "./pages/Presentation";
+import SubjectsPage from "./pages/SubjectsPage";
 
 const queryClient = new QueryClient();
 
@@ -106,6 +107,14 @@ function AppRoutes() {
             <AttendanceReport />
           </ProtectedStudentRoute>
         } 
+      />
+      <Route
+        path="/subjects"
+        element={
+          <ProtectedStudentRoute>
+            <SubjectsPage />
+          </ProtectedStudentRoute>
+        }
       />
       <Route path="/presentation" element={<Presentation />} />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
