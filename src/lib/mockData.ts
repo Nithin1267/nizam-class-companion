@@ -22,6 +22,7 @@ export interface Student {
   department: string;
   semester: number;
   email: string;
+  avatarUrl?: string | null;
 }
 
 export const mockStudent: Student = {

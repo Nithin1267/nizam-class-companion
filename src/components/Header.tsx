@@ -1,8 +1,9 @@
 import { Button } from '@/components/ui/button';
-import { GraduationCap, LogOut, User, Settings, FileBarChart, BookOpen } from 'lucide-react';
+import { GraduationCap, LogOut, User, FileBarChart, BookOpen } from 'lucide-react';
 import { Student } from '@/lib/mockData';
 import { NotificationBell } from '@/components/NotificationBell';
 import { RoleSwitcher } from '@/components/RoleSwitcher';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { Link } from 'react-router-dom';
 
 interface HeaderProps {
@@ -41,21 +42,25 @@ export function Header({ student, userId, onLogout }: HeaderProps) {
             </Link>
           </Button>
           
-          <Button variant="ghost" size="icon" asChild>
-            <Link to="/profile">
-              <Settings className="w-5 h-5" />
-            </Link>
-          </Button>
-          
-          <div className="hidden md:flex items-center gap-2 text-right ml-2">
-            <div>
-              <p className="text-sm font-medium">{student.name}</p>
+          <ThemeToggle />
+
+          <Link
+            to="/profile"
+            title="My Profile"
+            className="flex items-center gap-2 ml-1 rounded-full hover:bg-muted/60 transition-colors p-1 pr-2 md:pr-3"
+          >
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden ring-2 ring-transparent hover:ring-primary/30 transition">
+              {student.avatarUrl ? (
+                <img src={student.avatarUrl} alt={student.name} className="w-full h-full object-cover" />
+              ) : (
+                <User className="w-5 h-5 text-primary" />
+              )}
+            </div>
+            <div className="hidden md:block text-right">
+              <p className="text-sm font-medium leading-tight">{student.name}</p>
               <p className="text-xs text-muted-foreground">{student.rollNumber}</p>
             </div>
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <User className="w-5 h-5 text-primary" />
-            </div>
-          </div>
+          </Link>
           
           <Button variant="ghost" size="icon" onClick={onLogout}>
             <LogOut className="w-5 h-5" />
