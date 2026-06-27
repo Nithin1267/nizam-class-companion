@@ -6,11 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Footer } from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { GraduationCap, LogOut, Users, BookOpen, BarChart3, UserCog, Shield } from 'lucide-react';
+import { GraduationCap, LogOut, Users, BookOpen, BarChart3, UserCog, Shield, Layers, FileText } from 'lucide-react';
 import { RoleSwitcher } from '@/components/RoleSwitcher';
 import { UserManagement } from '@/components/admin/UserManagement';
 import { SystemAnalytics } from '@/components/admin/SystemAnalytics';
 import { SubjectOverview } from '@/components/admin/SubjectOverview';
+import { MasterDataManagement } from '@/components/admin/MasterDataManagement';
+import { StudyMaterialsManagement } from '@/components/admin/StudyMaterialsManagement';
 import { useToast } from '@/hooks/use-toast';
 
 interface Stats {
@@ -19,6 +21,8 @@ interface Stats {
   totalSubjects: number;
   lowAttendanceStudents: number;
   avgAttendance: number;
+  totalCourses: number;
+  totalMaterials: number;
 }
 
 export function AdminDashboard() {
@@ -31,6 +35,8 @@ export function AdminDashboard() {
     totalSubjects: 0,
     lowAttendanceStudents: 0,
     avgAttendance: 0,
+    totalCourses: 0,
+    totalMaterials: 0,
   });
   const [activeTab, setActiveTab] = useState('analytics');
 
@@ -73,6 +79,16 @@ export function AdminDashboard() {
       .from('subjects')
       .select('*', { count: 'exact', head: true });
 
+    // Count courses
+    const { count: courseCount } = await supabase
+      .from('courses')
+      .select('*', { count: 'exact', head: true });
+
+    // Count study materials
+    const { count: materialCount } = await supabase
+      .from('study_materials')
+      .select('*', { count: 'exact', head: true });
+
     // Count students with low attendance
     const { count: lowAttendance } = await supabase
       .from('attendance_summary')
@@ -95,6 +111,8 @@ export function AdminDashboard() {
       totalSubjects: subjectCount || 0,
       lowAttendanceStudents: lowAttendance || 0,
       avgAttendance: Math.round(avgAttendance * 10) / 10,
+      totalCourses: courseCount || 0,
+      totalMaterials: materialCount || 0,
     });
   };
 
@@ -154,7 +172,7 @@ export function AdminDashboard() {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
@@ -220,6 +238,32 @@ export function AdminDashboard() {
               </div>
             </CardContent>
           </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-lg bg-indigo-100 dark:bg-indigo-900/30">
+                  <Layers className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">{stats.totalCourses}</p>
+                  <p className="text-sm text-muted-foreground">Courses</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-lg bg-teal-100 dark:bg-teal-900/30">
+                  <FileText className="w-6 h-6 text-teal-600 dark:text-teal-400" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">{stats.totalMaterials}</p>
+                  <p className="text-sm text-muted-foreground">Study Materials</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Main Tabs */}
@@ -237,6 +281,14 @@ export function AdminDashboard() {
               <BookOpen className="w-4 h-4" />
               Subjects
             </TabsTrigger>
+            <TabsTrigger value="master" className="gap-2">
+              <Layers className="w-4 h-4" />
+              Master Data
+            </TabsTrigger>
+            <TabsTrigger value="materials" className="gap-2">
+              <FileText className="w-4 h-4" />
+              Study Materials
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="analytics">
@@ -249,6 +301,14 @@ export function AdminDashboard() {
 
           <TabsContent value="subjects">
             <SubjectOverview />
+          </TabsContent>
+
+          <TabsContent value="master">
+            <MasterDataManagement />
+          </TabsContent>
+
+          <TabsContent value="materials">
+            <StudyMaterialsManagement />
           </TabsContent>
         </Tabs>
       </main>
