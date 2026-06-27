@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Header } from '@/components/Header';
 import { AttendanceCard } from '@/components/AttendanceCard';
 import { SubjectTable } from '@/components/SubjectTable';
@@ -9,6 +9,10 @@ import { StatsCard } from '@/components/StatsCard';
 import { ProfileSetupCard } from '@/components/ProfileSetupCard';
 import { TimetableView } from '@/components/TimetableView';
 import { AttendancePrediction } from '@/components/AttendancePrediction';
+import { AttendanceCalendar, CalendarRecord } from '@/components/AttendanceCalendar';
+import { UpcomingClasses } from '@/components/UpcomingClasses';
+import { DownloadReports } from '@/components/DownloadReports';
+import { SubjectFilters, SubjectFilter, applySubjectFilter } from '@/components/SubjectFilters';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { BookOpen, FlaskConical, Target, Calendar, AlertTriangle, TrendingUp, Loader2 } from 'lucide-react';
@@ -23,6 +27,8 @@ export function Dashboard({ onLogout }: DashboardProps) {
   const [student, setStudent] = useState<Student | null>(null);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [attendanceHistory, setAttendanceHistory] = useState<AttendanceRecord[]>([]);
+  const [calendarRecords, setCalendarRecords] = useState<CalendarRecord[]>([]);
+  const [subjectFilter, setSubjectFilter] = useState<SubjectFilter>('all');
   const [loading, setLoading] = useState(true);
   const [profileMissing, setProfileMissing] = useState(false);
 
@@ -56,6 +62,13 @@ export function Dashboard({ onLogout }: DashboardProps) {
         }
         console.error('Error fetching profile:', profileError);
       } else if (profile) {
+        let avatarUrl: string | null = null;
+        if ((profile as any).avatar_url) {
+          const { data: signed } = await supabase.storage
+            .from('avatars')
+            .createSignedUrl((profile as any).avatar_url, 60 * 60);
+          avatarUrl = signed?.signedUrl ?? null;
+        }
         setStudent({
           id: profile.user_id,
           name: profile.name,
@@ -63,6 +76,7 @@ export function Dashboard({ onLogout }: DashboardProps) {
           email: profile.email,
           department: profile.department,
           semester: profile.semester,
+          avatarUrl,
         });
       }
 
@@ -117,6 +131,26 @@ export function Dashboard({ onLogout }: DashboardProps) {
           type: record.subjects?.type as 'theory' | 'lab' || 'theory',
         }));
         setAttendanceHistory(mappedRecords);
+      }
+
+      // Fetch a wider range of records for the calendar view (last ~120 days)
+      const since = new Date();
+      since.setDate(since.getDate() - 120);
+      const { data: calData } = await supabase
+        .from('attendance_records')
+        .select('date, status, subjects(name, type)')
+        .eq('user_id', user.id)
+        .gte('date', since.toISOString().slice(0, 10))
+        .order('date', { ascending: false });
+      if (calData) {
+        setCalendarRecords(
+          calData.map((r: any) => ({
+            date: r.date,
+            subject: r.subjects?.name || 'Class',
+            status: r.status,
+            type: (r.subjects?.type as 'theory' | 'lab') || 'theory',
+          })),
+        );
       }
     } catch (err) {
       console.error('Error loading dashboard data:', err);
@@ -179,19 +213,38 @@ export function Dashboard({ onLogout }: DashboardProps) {
   
   const atRiskSubjects = subjects.filter(s => s.percentage < 75).length;
 
+  const filterCounts = useMemo(
+    () => ({
+      all: subjects.length,
+      theory: subjects.filter((s) => s.type === 'theory').length,
+      lab: subjects.filter((s) => s.type === 'lab').length,
+      safe: subjects.filter((s) => s.percentage >= 75).length,
+      warning: subjects.filter((s) => s.percentage >= 70 && s.percentage < 75).length,
+      critical: subjects.filter((s) => s.percentage < 70).length,
+    }),
+    [subjects],
+  );
+  const filteredSubjects = useMemo(
+    () => applySubjectFilter(subjects, subjectFilter),
+    [subjects, subjectFilter],
+  );
+
   return (
     <div className="min-h-screen bg-background">
       <Header student={student} userId={user?.id || ''} onLogout={onLogout} />
       
       <main className="container px-4 py-6">
         {/* Welcome Section - Shows logged-in student's name */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold font-display text-foreground">
-            Welcome back, {student.name.split(' ')[0]}! 👋
-          </h2>
-          <p className="text-muted-foreground mt-1">
-            {student.department} • Semester {student.semester} • Roll No: {student.rollNumber}
-          </p>
+        <div className="mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-bold font-display text-foreground">
+              Welcome back, {student.name.split(' ')[0]}! 👋
+            </h2>
+            <p className="text-muted-foreground mt-1">
+              {student.department} • Semester {student.semester} • Roll No: {student.rollNumber}
+            </p>
+          </div>
+          <DownloadReports student={student} subjects={subjects} />
         </div>
 
         {/* Alert Banner if at risk */}
@@ -281,10 +334,30 @@ export function Dashboard({ onLogout }: DashboardProps) {
         {/* Subject Table and Recent Activity */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           <div className="lg:col-span-2">
-            <SubjectTable subjects={subjects} />
+            <div className="space-y-3">
+              <SubjectFilters
+                value={subjectFilter}
+                onChange={setSubjectFilter}
+                counts={filterCounts}
+              />
+              <SubjectTable subjects={filteredSubjects} />
+            </div>
           </div>
           <div>
             <RecentAttendance records={attendanceHistory} />
+          </div>
+        </div>
+
+        {/* Today's classes + Attendance calendar */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          <div>
+            <UpcomingClasses
+              semester={student.semester}
+              department={student.department}
+            />
+          </div>
+          <div className="lg:col-span-2">
+            <AttendanceCalendar records={calendarRecords} />
           </div>
         </div>
 
